@@ -1,0 +1,31 @@
+function createSheetsForSalespersons() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Sheet Name"); // Replace "Sheet Name" with the name of your sheet
+
+  var salespersons = {}; 
+  var rows = sheet.getDataRange().getValues();
+  
+  
+  for (var i = 1; i < rows.length; i++) { // Start from 1 to skip header row
+    var salesperson = rows[i][0]; // Assuming the salesperson name is in the first column
+    if (!salespersons.hasOwnProperty(salesperson)) {
+      salespersons[salesperson] = [];
+    }
+    salespersons[salesperson].push(rows[i]); // Store sales data for each salesperson
+  }
+  
+  // Create a new spreadsheet for each salesperson
+  var spreadsheetLinks = []; // Array to store links to the new spreadsheets
+  for (var name in salespersons) {
+    var newSS = SpreadsheetApp.create(name + "'s Prospect/Follow-up || 2024"); // Create a new spreadsheet
+    var newSheet = newSS.getActiveSheet();
+    newSheet.getRange(1, 1, salespersons[name].length, salespersons[name][0].length).setValues(salespersons[name]); // Copy data to the new sheet
+    
+    // Get the URL of the newly created spreadsheet and add it to the array
+    var spreadsheetUrl = newSS.getUrl();
+    spreadsheetLinks.push({ name: name, url: spreadsheetUrl });
+  }
+  
+  // Log the links to the new spreadsheets
+  Logger.log(spreadsheetLinks);
+}
